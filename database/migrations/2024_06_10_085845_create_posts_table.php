@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('place');
             $table->string('title');
             $table->string('body');
-            $table->string('image')->nullable();
+            $table->string('image_url')->nullable();
             $table->string('reference');
             $table->timestamps();
             $table->softDeletes();

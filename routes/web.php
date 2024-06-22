@@ -24,9 +24,15 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+     Route::get('/posts/{post}/edit', [PostController::class, 'edit']);
+     Route::get('/posts/create', [PostController::class, 'create']);
+    Route::get('/posts/{post}', [PostController::class ,'show']);
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::put('/posts/{post}', [PostController::class, 'update']);
+    Route::delete('/posts/{post}', [PostController::class,'delete']);
 });
 
 Route::get('/', [PostController::class, 'index']);
