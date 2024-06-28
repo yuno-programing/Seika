@@ -12,10 +12,6 @@ use Cloudinary;
 
 class PostController extends Controller
 {
-    public function index(Post $post)
-    {
-        return view('posts.index')->with(['posts' => $post->getPaginateByLimit(1)]);
-    }
     public function show (Post $post)
     {
         return view('posts.show')->with(['post' => $post]);
@@ -33,8 +29,10 @@ class PostController extends Controller
     {
         $input = $request['post'];
         $input['user_id'] = Auth::id();
-        $image_url = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
-        $input += ['image_url' => $image_url];
+        if(!empty($request->file('image'))){
+          $image_url = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath(); 
+           $input += ['image_url' => $image_url];
+        }
         $post->fill($input)->save();
         return redirect('/posts/' . $post->id);
     }
@@ -59,5 +57,25 @@ class PostController extends Controller
         $post->delete();
         return redirect('/');
     }
-    
-}
+    public function index(Request $request, Prefecture $prefectures)
+     {
+        $prefecture_id = $request->input('prefecture');
+        $keyword = $request->input('keyword');
+
+        $query = Post::query();
+           
+        if(!empty($prefecture_id)) {
+            $query->where('prefecture_id', 'LIKE', $prefecture_id);
+        }
+
+        if(!empty($keyword)) {
+            $query->where('title', 'LIKE', "%{$keyword}%")->orWhere('body', 'LIKE', "%{$keyword}%");
+        }
+
+        $posts = $query->get();
+
+        return view('posts.index', compact('posts', 'keyword', 'prefecture_id'))->with([
+            'prefectures' => $prefectures->get(),
+        ]);
+    }
+}    
